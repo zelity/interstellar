@@ -7,20 +7,18 @@ const Fail = fs.readFileSync("Failed.html", "utf8")
 
 export function setupMasqr(app) {
   app.use(async (req, res, next) => {
-    if (req.url.includes("/ov/")) {
+    if (req.url.includes("/ca/")) {
       next()
       return
     }
 
     const authheader = req.headers.authorization
 
-    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     if (req.cookies["authcheck"]) {
       next()
       return
     }
 
-    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     if (req.cookies["refreshcheck"] !== "true") {
       res.cookie("refreshcheck", "true", { maxAge: 10000 })
       MasqFail(req, res)
@@ -39,13 +37,10 @@ export function setupMasqr(app) {
 
     try {
       const licenseCheckResponse = await fetch(
-        // biome-ignore lint/style/useTemplate: <explanation>
         LICENSE_SERVER_URL + pass + "&host=" + req.headers.host
       )
-      // biome-ignore lint/complexity/useLiteralKeys: <explanation>
       const licenseCheck = (await licenseCheckResponse.json())["status"]
       console.log(
-        // biome-ignore lint/style/useTemplate: <explanation>
         LICENSE_SERVER_URL + pass + "&host=" + req.headers.host + " returned " + licenseCheck
       )
       if (licenseCheck === "License valid") {
@@ -68,10 +63,8 @@ async function MasqFail(req, res) {
   if (!req.headers.host) {
     return
   }
-  // biome-ignore lint/style/useTemplate: <explanation>
   const unsafeSuffix = req.headers.host + ".html"
   const safeSuffix = path.normalize(unsafeSuffix).replace(/^(\.\.(\/|\\|$))+/, "")
-  // biome-ignore lint/style/useTemplate: <explanation>
   const safeJoin = path.join(process.cwd() + "/Masqrd", safeSuffix)
   try {
     await fs.promises.access(safeJoin)

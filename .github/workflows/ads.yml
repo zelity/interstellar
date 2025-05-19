@@ -1,4 +1,4 @@
-name: Update Ad-Free branch
+name: Remove Ads
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         with:
           ref: main
 
-      - name: Create or update Ad-Free branch
+      - name: Remove Ads
         run: |
           git fetch origin
           if git branch --list | grep -q 'Ad-Free'; then
@@ -26,16 +26,10 @@ jobs:
             git checkout -b Ad-Free
           fi
 
-      - name: Remove ads from HTML files
+      - name: Remove first 9 lines from m.js
         run: |
-          for file in static/404.html static/apps.html static/games.html static/index.html static/privacy.html static/settings.html static/tools.html static/tos.html; do
-            if [ -f "$file" ]; then
-              sed -i '/<div>/,/<\/div>/d' "$file"
-            else
-              echo "$file not found"
-            fi
-          done
-
+          sed -i '1,9d' static/assets/js/m.js
+  
       - name: Commit changes
         env:
           GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
@@ -43,8 +37,8 @@ jobs:
         run: |
           git config --global user.name "${GIT_USERNAME}"
           git config --global user.email "${GIT_EMAIL}"
-          git add static/404.html static/apps.html static/games.html static/index.html static/privacy.html static/settings.html static/tools.html static/tos.html
-          git commit -m "Remove ads from HTML files"
+          git add static/assets/js/m.js
+          git commit -m "Remove specific JS code from m.js"
 
       - name: Push changes to Ad-Free branch
         run: |
